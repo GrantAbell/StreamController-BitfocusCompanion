@@ -19,6 +19,7 @@ LOCALES = ROOT / "locales.csv"
 # Files that build user-visible UI.
 UI_SOURCES = [
     ROOT / "actions" / "companion_button.py",
+    ROOT / "actions" / "companion_page.py",
     ROOT / "ui" / "plugin_settings.py",
     ROOT / "main.py",
 ]

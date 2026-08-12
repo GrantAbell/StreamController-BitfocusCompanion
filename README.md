@@ -41,6 +41,31 @@ Each `Companion Button` action then specifies which Companion button the
 physical control represents, using 1-based page/row/column coordinates, and
 whether it follows Companion's currently active page.
 
+## Pages
+
+Companion gives **every surface its own current page**, and this plugin
+registers as one surface. That has a consequence worth knowing before you
+configure anything:
+
+- **Dynamic** controls (`Follow the current Companion page` on) mirror whatever
+  page *this surface* is on.
+- Browsing to another page in the Companion web UI's **Buttons** tab is an
+  editor view. It moves no surface, so dynamic controls will not follow it.
+- **Static** controls name a page outright and ignore surface paging entirely.
+
+To move the surface, use the `Companion Page` action, set to next or previous
+page. On a dial it also pages on rotation, clockwise for next. Alternatively,
+change the page from Companion's **Surfaces** tab, or map a Companion button
+that runs an internal page action — presses arrive tagged with this surface, so
+Companion pages the right one.
+
+> **The `Companion Page` action needs permission.** The plugin declares the
+> capability, but Companion gates it behind a per-surface checkbox that is
+> **unticked by default**. Tick `Allow StreamController to change this surface
+> page` in Companion under **Surfaces → your StreamController surface →
+> Settings**. Until you do, Companion accepts the request and discards it
+> silently — the key will appear to do nothing.
+
 ## Development
 
 The Companion protocol, domain and transport code under `companion/` imports

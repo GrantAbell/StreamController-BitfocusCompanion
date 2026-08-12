@@ -350,6 +350,17 @@ class TestSerialization:
         assert f"BITMAPS={constants.BITMAP_SIZE}" in line
         assert "BRIGHTNESS=0" in line
 
+    def test_add_device_declares_page_change_capability(self):
+        """Companion needs a non-empty string here, not a boolean.
+
+        It uses the text as a checkbox label, and `typeof x === 'string'` is the
+        actual gate, so sending a bare flag would silently disable CHANGE-PAGE.
+        """
+        line = protocol.add_device("dev", rows=4, columns=8).decode()
+
+        assert f'CAN_CHANGE_PAGE="{constants.CAN_CHANGE_PAGE_LABEL}"' in line
+        assert constants.CAN_CHANGE_PAGE_LABEL != ""
+
     def test_add_device_omits_bitmap_format_for_raw(self):
         """Omitting it keeps Companion on its default rgb encoding."""
         for fmt in (None, constants.RAW_BITMAP_FORMAT):
@@ -383,6 +394,15 @@ class TestSerialization:
         )
         assert protocol.sub_rotate("3/1/4", clockwise=False) == (
             b'SUB-ROTATE SUBID="3/1/4" DIRECTION=0\n'
+        )
+
+    def test_change_page_direction(self):
+        """1 is next, 0 is previous, matching KEY-ROTATE's convention."""
+        assert protocol.change_page("dev", forward=True) == (
+            b'CHANGE-PAGE DEVICEID="dev" DIRECTION=1\n'
+        )
+        assert protocol.change_page("dev", forward=False) == (
+            b'CHANGE-PAGE DEVICEID="dev" DIRECTION=0\n'
         )
 
     def test_remove_device(self):
@@ -429,6 +449,7 @@ class TestRoundTrip:
             protocol.key_press("dev", 0, pressed=True),
             protocol.key_press("dev", 31, pressed=False),
             protocol.key_rotate("dev", 7, clockwise=True),
+            protocol.change_page("dev", forward=True),
             protocol.add_sub("3/1/4"),
             protocol.remove_sub("3/1/4"),
             protocol.sub_press("3/1/4", pressed=True),

@@ -56,6 +56,15 @@ RAW_BITMAP_FORMAT: Final[str] = "rgb"
 MIN_SURFACE_ROWS: Final[int] = 4
 MIN_SURFACE_COLUMNS: Final[int] = 8
 
+# --- Page navigation ------------------------------------------------------
+
+# Sent as CAN_CHANGE_PAGE on ADD-DEVICE. Companion requires a non-empty *string*
+# here, not a boolean: it uses the text verbatim as the label of a per-surface
+# checkbox which defaults to unticked. Until the user ticks it, Companion
+# answers CHANGE-PAGE with OK and then discards it (Surface/IP/Satellite.ts,
+# `doChangePage`), so declaring this grants nothing on its own.
+CAN_CHANGE_PAGE_LABEL: Final[str] = "Allow StreamController to change this surface page"
+
 # --- Coordinate sanity limits ---------------------------------------------
 #
 # These are not protocol limits — Satellite imposes none. They exist so that a

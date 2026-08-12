@@ -332,6 +332,11 @@ def add_device(
         "KEYS_PER_ROW": columns,
         "BITMAPS": constants.BITMAP_SIZE,
         "BRIGHTNESS": 0,
+        # Opts this surface into CHANGE-PAGE. Must be a non-empty string, which
+        # Companion shows as a checkbox label in the surface's settings; the box
+        # is unticked by default, so this is a request for permission rather
+        # than a grant of it.
+        "CAN_CHANGE_PAGE": constants.CAN_CHANGE_PAGE_LABEL,
     }
     # Omitted entirely when no compressed format was negotiated, which keeps
     # Companion on its default raw rgb encoding.
@@ -356,6 +361,23 @@ def key_rotate(device_id: str, key_index: int, clockwise: bool) -> bytes:
     return serialize(
         "KEY-ROTATE",
         {"DEVICEID": device_id, "KEY": key_index, "DIRECTION": 1 if clockwise else 0},
+    )
+
+
+def change_page(device_id: str, forward: bool) -> bytes:
+    """Move the registered surface to the next or previous Companion page.
+
+    This is the only way for a surface to page itself: Companion gives each
+    surface its own current page, and browsing pages in the web UI's Buttons tab
+    is an editor view that moves nothing.
+
+    Requires ``CAN_CHANGE_PAGE`` on the ADD-DEVICE that registered the surface.
+    Companion replies OK whether or not it acted, so a reply is not evidence
+    that the page moved.
+    """
+    return serialize(
+        "CHANGE-PAGE",
+        {"DEVICEID": device_id, "DIRECTION": 1 if forward else 0},
     )
 
 
@@ -403,6 +425,7 @@ class Inbound:
     REMOVE_DEVICE = "REMOVE-DEVICE"
     KEY_PRESS = "KEY-PRESS"
     KEY_ROTATE = "KEY-ROTATE"
+    CHANGE_PAGE = "CHANGE-PAGE"
     SUB_PRESS = "SUB-PRESS"
     SUB_ROTATE = "SUB-ROTATE"
     BRIGHTNESS = "BRIGHTNESS"

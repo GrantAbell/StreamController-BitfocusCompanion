@@ -1,6 +1,7 @@
 key;en_US
 plugin.name;Bitfocus Companion
 actions.companion-button.name;Companion Button
+actions.companion-page.name;Companion Page
 settings.group.title;Bitfocus Companion
 settings.group.description;Where to reach Companion. These settings are shared by every Companion Button.
 settings.host.title;Host
@@ -27,6 +28,10 @@ action.dynamic-page.subtitle;Off: always use the fixed page below
 action.page.title;Page
 action.row.title;Row
 action.column.title;Column
+action.page-direction.title;Direction
+action.page-direction.subtitle;Companion must also allow page changes for this surface, in Surfaces > Settings
+action.page-direction.next;Next page
+action.page-direction.previous;Previous page
 key.loading;Loading
 key.offline;Companion\noffline
 key.invalid-config;Invalid\nconfig
@@ -34,4 +39,6 @@ key.no-plugin;No\nplugin
 key.incompatible;Companion\nversion
 key.config-error;Config\nerror
 key.static-unsupported;Static\nunsupported
+key.page-next;Next\npage
+key.page-previous;Prev\npage
 error.static-unsupported;This Companion does not support static-page subscriptions

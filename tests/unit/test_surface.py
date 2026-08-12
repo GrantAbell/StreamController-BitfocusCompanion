@@ -240,6 +240,104 @@ class TestRegistration:
 
         assert send.sent == []
 
+    def test_page_navigation_registers_a_surface_with_no_dynamic_buttons(self):
+        """A layout whose only Companion control is a page key still needs a device.
+
+        Companion resolves CHANGE-PAGE by DEVICEID, so without this the key
+        would be inert for reasons invisible to the user.
+        """
+        send = SendLog()
+        surface = _surface(send)
+
+        surface.require_page_navigation(object())
+
+        assert surface.is_registered
+        assert send.commands() == ["ADD-DEVICE"]
+
+    def test_page_navigation_hold_is_idempotent(self):
+        send = SendLog()
+        surface = _surface(send)
+        client = object()
+
+        surface.require_page_navigation(client)
+        send.clear()
+        surface.require_page_navigation(client)
+
+        assert send.sent == []
+
+    def test_page_navigation_survives_a_reconnect(self):
+        """Companion forgets our device, so the hold must recreate it."""
+        send = SendLog()
+        surface = _surface(send)
+        surface.require_page_navigation(object())
+        surface.on_disconnected()
+        send.clear()
+
+        surface.on_connected(CAPS_RAW)
+
+        assert surface.is_registered
+        assert send.commands() == ["ADD-DEVICE"]
+
+    def test_releasing_the_last_hold_stops_recreating_the_surface(self):
+        send = SendLog()
+        surface = _surface(send)
+        client = object()
+        surface.require_page_navigation(client)
+
+        surface.release_page_navigation(client)
+        surface.on_disconnected()
+        send.clear()
+        surface.on_connected(CAPS_RAW)
+
+        assert not surface.is_registered
+        assert send.sent == []
+
+    def test_a_remaining_hold_keeps_the_surface(self):
+        send = SendLog()
+        surface = _surface(send)
+        first, second = object(), object()
+        surface.require_page_navigation(first)
+        surface.require_page_navigation(second)
+
+        surface.release_page_navigation(first)
+        surface.on_disconnected()
+        send.clear()
+        surface.on_connected(CAPS_RAW)
+
+        assert surface.is_registered
+
+    def test_change_page_sends_the_direction(self):
+        send = SendLog()
+        surface = _surface(send)
+        surface.require(_dyn(0, 0))
+        send.clear()
+
+        assert surface.change_page(True) is True
+        assert send.last() == (
+            'CHANGE-PAGE DEVICEID="streamcontroller-companion-test" DIRECTION=1'
+        )
+
+        assert surface.change_page(False) is True
+        assert "DIRECTION=0" in send.last()
+
+    def test_change_page_needs_a_registered_device(self):
+        """Companion errors on a DEVICEID it has never seen; do not send one."""
+        send = SendLog()
+        surface = _surface(send)
+
+        assert surface.change_page(True) is False
+        assert send.sent == []
+
+    def test_change_page_is_dropped_while_disconnected(self):
+        send = SendLog()
+        surface = _surface(send)
+        surface.require(_dyn(0, 0))
+        surface.on_disconnected()
+        send.clear()
+
+        assert surface.change_page(True) is False
+        assert send.sent == []
+
     def test_static_addresses_are_rejected(self):
         send = SendLog()
         surface = _surface(send)

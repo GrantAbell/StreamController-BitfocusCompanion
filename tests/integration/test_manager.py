@@ -422,6 +422,64 @@ class TestMessageFanOut:
             assert server.wait_for_line("PONG", timeout=5.0)
 
 
+# --- Page navigation -------------------------------------------------------
+
+
+class TestPageNavigation:
+    def test_holding_navigation_registers_the_surface(self, manager_factory):
+        """The hold is what makes a page-only layout able to page at all."""
+        with FakeSatelliteServer(greeting=FULL_GREETING) as server:
+            manager = manager_factory(_settings(server.port))
+            manager.start()
+            assert _wait_state(manager, ConnectionState.CONNECTED)
+
+            manager.hold_page_navigation(object())
+
+            assert server.wait_for_line("ADD-DEVICE", timeout=5.0)
+            assert "CAN_CHANGE_PAGE" in server.received_text()
+
+    def test_change_page_reaches_companion(self, manager_factory):
+        with FakeSatelliteServer(greeting=FULL_GREETING) as server:
+            manager = manager_factory(_settings(server.port))
+            manager.start()
+            assert _wait_state(manager, ConnectionState.CONNECTED)
+            manager.hold_page_navigation(object())
+            assert server.wait_for_line("ADD-DEVICE", timeout=5.0)
+            server.clear_received()
+
+            assert manager.change_page(True) is True
+
+            assert server.wait_for_line("CHANGE-PAGE", timeout=5.0)
+            assert "DIRECTION=1" in server.received_text()
+
+    def test_change_page_without_a_surface_is_not_sent(self, manager_factory):
+        """Companion errors on an unknown DEVICEID; stay quiet instead."""
+        with FakeSatelliteServer(greeting=FULL_GREETING) as server:
+            manager = manager_factory(_settings(server.port))
+            manager.start()
+            assert _wait_state(manager, ConnectionState.CONNECTED)
+            server.clear_received()
+
+            assert manager.change_page(True) is False
+            assert "CHANGE-PAGE" not in server.received_text()
+
+    def test_a_rejected_change_page_does_not_break_the_connection(
+        self, manager_factory
+    ):
+        with FakeSatelliteServer(greeting=FULL_GREETING) as server:
+            manager = manager_factory(_settings(server.port))
+            manager.start()
+            assert _wait_state(manager, ConnectionState.CONNECTED)
+
+            server.send_line(
+                'CHANGE-PAGE ERROR=1 DEVICEID="dev" MESSAGE="Missing DIRECTION"'
+            )
+
+            assert _wait_until(
+                lambda: manager.status.state is ConnectionState.CONNECTED, 2.0
+            )
+
+
 # --- Robustness ------------------------------------------------------------
 
 

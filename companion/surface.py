@@ -55,6 +55,10 @@ class DynamicSurface:
 
         self._lock = threading.RLock()
         self._required: set[CompanionAddress] = set()
+        # Controls that need the surface to exist purely so they can page it.
+        # Held as a set of client objects rather than a count so that a repeated
+        # require or release cannot drift the way a counter would.
+        self._navigators: set[object] = set()
 
         # Geometry Companion currently knows about. None until ADD-DEVICE is
         # sent; KEY-STATE cannot be decoded before that because the flat key
@@ -138,6 +142,49 @@ class DynamicSurface:
     def clear_requirements(self) -> None:
         with self._lock:
             self._required.clear()
+            self._navigators.clear()
+
+    # --- Page navigation ---------------------------------------------------
+
+    def require_page_navigation(self, client: object) -> None:
+        """Keep the surface registered on behalf of a page-navigation control.
+
+        Companion resolves CHANGE-PAGE by DEVICEID, so a layout whose only
+        Companion control is a page key still needs the device to exist. Without
+        this the surface would only be registered when a dynamic button happened
+        to be present, and the page key would be inert for reasons the user
+        cannot see.
+        """
+        with self._lock:
+            if client in self._navigators:
+                return
+            self._navigators.add(client)
+            self._sync_locked()
+
+    def release_page_navigation(self, client: object) -> None:
+        """Stop holding the surface open for a page-navigation control.
+
+        Like :meth:`release`, this does not unregister: the surface is left as
+        it is, and simply will not be recreated on the next connection if
+        nothing wants it by then.
+        """
+        with self._lock:
+            self._navigators.discard(client)
+
+    def change_page(self, forward: bool) -> bool:
+        """Ask Companion to page this surface forward or back.
+
+        Returns whether the request was *sent*. Companion answers OK even when
+        it ignores the request, which it does unless the user has ticked the
+        surface's page-change checkbox, so there is nothing better to report.
+        """
+        with self._lock:
+            if not self._connected or self._registered is None:
+                log.debug("CHANGE-PAGE dropped: surface is not registered")
+                return False
+            device_id = self._device_id
+
+        return self._send(protocol.change_page(device_id, forward))
 
     # --- Connection lifecycle ---------------------------------------------
 
@@ -154,7 +201,7 @@ class DynamicSurface:
             # Forget the old registration: this is a new connection and
             # Companion knows nothing about our previous device.
             self._registered = None
-            if self._required:
+            if self._required or self._navigators:
                 self._register_locked(self._needed_geometry())
 
     def on_disconnected(self) -> None:

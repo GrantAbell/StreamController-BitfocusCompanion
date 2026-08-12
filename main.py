@@ -19,6 +19,7 @@ from src.Signals import Signals
 import globals as gl
 
 from .actions.companion_button import CompanionButton
+from .actions.companion_page import CompanionPage
 from . import companion as _companion_package
 from .companion import constants
 from .companion.manager import CompanionConnectionManager
@@ -106,6 +107,21 @@ class CompanionPlugin(PluginBase):
         )
         self.add_action_holder(self.companion_button_holder)
 
+        self.companion_page_holder = ActionHolder(
+            plugin_base=self,
+            action_core=CompanionPage,
+            action_id_suffix="CompanionPage",
+            action_name=self.locale_manager.get(
+                "actions.companion-page.name", "Companion Page"
+            ),
+            action_support={
+                Input.Key: ActionInputSupport.SUPPORTED,
+                Input.Dial: ActionInputSupport.SUPPORTED,
+                Input.Touchscreen: ActionInputSupport.UNSUPPORTED,
+            },
+        )
+        self.add_action_holder(self.companion_page_holder)
+
         self.register()
 
         log.info(
@@ -182,16 +198,16 @@ class CompanionPlugin(PluginBase):
             except Exception as exc:  # noqa: BLE001
                 log.error(f"Companion action failed handling status change: {exc}")
 
-    def _live_actions(self) -> list[CompanionButton]:
-        """Every CompanionButton StreamController currently has instantiated."""
-        found: list[CompanionButton] = []
+    def _live_actions(self) -> list[CompanionButton | CompanionPage]:
+        """Every action of ours StreamController currently has instantiated."""
+        found: list[CompanionButton | CompanionPage] = []
         try:
             for controller in gl.deck_manager.deck_controller:
                 page = controller.active_page
                 if page is None:
                     continue
                 for action in page.get_all_actions():
-                    if isinstance(action, CompanionButton):
+                    if isinstance(action, (CompanionButton, CompanionPage)):
                         found.append(action)
         except Exception as exc:  # noqa: BLE001
             log.debug(f"Could not enumerate Companion actions: {exc}")

@@ -305,6 +305,23 @@ class CompanionConnectionManager:
             return False
         return self.send(protocol.sub_rotate(address.sub_id, clockwise))
 
+    def change_page(self, forward: bool) -> bool:
+        """Move the virtual surface to the next or previous Companion page.
+
+        Every dynamic-page control follows automatically: Companion redraws the
+        whole surface and the resulting KEY-STATE messages are routed by the
+        existing subscription machinery. Static controls are unaffected by
+        design, since they name a page outright.
+        """
+        return self.surface.change_page(forward)
+
+    def hold_page_navigation(self, client: object) -> None:
+        """Keep the surface registered so ``change_page`` has a device to act on."""
+        self.surface.require_page_navigation(client)
+
+    def release_page_navigation(self, client: object) -> None:
+        self.surface.release_page_navigation(client)
+
     def _send_press(self, address: CompanionAddress, pressed: bool) -> bool:
         with self._lock:
             self._press_sent_at[address] = time.monotonic()
@@ -566,6 +583,7 @@ class CompanionConnectionManager:
             protocol.Inbound.KEY_ROTATE,
             protocol.Inbound.SUB_PRESS,
             protocol.Inbound.SUB_ROTATE,
+            protocol.Inbound.CHANGE_PAGE,
         ):
             self._handle_input_reply(message)
             return
@@ -648,9 +666,13 @@ class CompanionConnectionManager:
     def _handle_input_reply(self, message: SatelliteMessage) -> None:
         """Log a rejected input event.
 
-        Companion acknowledges every press and rotation with ``OK=1``, or
-        rejects it with ``ERROR=1 MESSAGE=...``. Silently dropping the error
-        would make a mis-addressed button look like a dead one.
+        Companion acknowledges every press, rotation and page change with
+        ``OK=1``, or rejects it with ``ERROR=1 MESSAGE=...``. Silently dropping
+        the error would make a mis-addressed button look like a dead one.
+
+        An ``OK`` to CHANGE-PAGE is weaker than it looks: Companion sends it
+        even when it discards the request because the user has not ticked the
+        surface's page-change checkbox. Only the absence of an error is real.
         """
         if not message.flag("ERROR"):
             return
