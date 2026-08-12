@@ -1,0 +1,14 @@
+{
+    "author": "Grant Abell",
+    "copyright": "Copyright (C) 2026 Grant Abell. Licensed under GPL-3.0-or-later.",
+    "credits": [
+        "Bitfocus AS \u2014 Companion and the Satellite protocol",
+        "Core447 \u2014 StreamController"
+    ],
+    "acknowledgements": "Behaviourally based on Bitfocus's Stream Deck Companion plugin (io.bitfocus.companion-plugin, MIT). This project is not affiliated with or endorsed by Bitfocus AS.",
+    "comments": "Integrates StreamController with Bitfocus Companion as a Satellite control surface.",
+    "support": "https://github.com/grantabell/StreamController-BitfocusCompanion/issues",
+    "release-notes": {
+        "0.1.0": "Initial development release."
+    }
+}

@@ -1,0 +1,11 @@
+[tool.pytest.ini_options]
+# The plugin root is on the path so `companion.*` imports resolve during tests
+# without StreamController being installed. Nothing under `companion/` may
+# import StreamController — that boundary is what keeps the suite runnable.
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["companion"]
+omit = ["companion/transports/satellite_websocket.py", "companion/transports/legacy_websocket.py"]

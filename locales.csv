@@ -1,0 +1,37 @@
+key;en_US
+plugin.name;Bitfocus Companion
+actions.companion-button.name;Companion Button
+settings.group.title;Bitfocus Companion
+settings.group.description;Where to reach Companion. These settings are shared by every Companion Button.
+settings.host.title;Host
+settings.host.subtitle;Hostname or IP address of the machine running Companion
+settings.port.title;Port
+settings.status.title;Status
+settings.companion.title;Companion
+settings.device-id.title;Device identifier
+settings.debug.title;Enable debug logging
+settings.debug.subtitle;Logs protocol commands and addresses. Never image data.
+settings.reconnect;Reconnect now
+settings.unknown;—
+status.disconnected;Disconnected
+status.connecting;Connecting
+status.negotiating;Negotiating
+status.connected;Connected
+status.incompatible;Incompatible Companion version
+status.config-error;Configuration error
+status.stopping;Stopping
+status.subscriptions.supported;subscriptions: supported
+status.subscriptions.unsupported;subscriptions: unsupported
+action.dynamic-page.title;Follow the current Companion page
+action.dynamic-page.subtitle;Off: always use the fixed page below
+action.page.title;Page
+action.row.title;Row
+action.column.title;Column
+key.loading;Loading
+key.offline;Companion\noffline
+key.invalid-config;Invalid\nconfig
+key.no-plugin;No\nplugin
+key.incompatible;Companion\nversion
+key.config-error;Config\nerror
+key.static-unsupported;Static\nunsupported
+error.static-unsupported;This Companion does not support static-page subscriptions

@@ -1,0 +1,17 @@
+{
+    "general": {
+        "name": "Bitfocus Companion Satellite protocol",
+        "comment": "The Companion Satellite wire protocol and connection behaviour implemented here were derived by studying Bitfocus's Stream Deck Companion plugin. No source code was copied; this is an independent Python reimplementation of the observable behaviour.",
+        "copyright": "Copyright \u00a9 Bitfocus AS",
+        "license": "MIT",
+        "license-url": "https://github.com/bitfocus/io.bitfocus.companion-plugin/blob/main/LICENSE",
+        "original-url": "https://github.com/bitfocus/io.bitfocus.companion-plugin"
+    },
+    "plugin": {
+        "name": "Bitfocus Companion plugin for StreamController",
+        "copyright": "Copyright (C) 2026 Grant Abell",
+        "license": "GPL-3.0-or-later",
+        "license-url": "https://www.gnu.org/licenses/gpl-3.0.html",
+        "comment": "Licensed GPLv3 to match StreamController, the application this plugin runs inside."
+    }
+}

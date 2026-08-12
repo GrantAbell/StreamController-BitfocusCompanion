@@ -1,0 +1,7 @@
+# Phase 1 deliberately has no third-party dependencies.
+#
+# Networking uses the Python standard library (socket, threading, queue) and
+# image handling uses Pillow, which StreamController already provides.
+#
+# Phase 2 will add a WebSocket implementation; it must be pinned and
+# verified inside the StreamController Flatpak first.

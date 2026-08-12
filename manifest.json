@@ -1,0 +1,22 @@
+{
+    "id": "com_grantabell_companion",
+    "name": "Bitfocus Companion",
+    "version": "0.1.0",
+    "app-version": "1.5.0-beta.15",
+    "minimum-app-version": "1.5.0-beta.15",
+    "github": "https://github.com/grantabell/StreamController-BitfocusCompanion",
+    "thumbnail": "store/Thumbnail.png",
+    "tags": [
+        "Companion",
+        "Bitfocus",
+        "Streaming",
+        "Broadcast",
+        "Remote Control"
+    ],
+    "short-descriptions": {
+        "en_US": "Use your Stream Deck as a Bitfocus Companion surface."
+    },
+    "descriptions": {
+        "en_US": "Turns StreamController-controlled hardware into a native Bitfocus Companion control surface.\n\nConnects persistently to Companion over the Satellite protocol, registers as a surface, and mirrors Companion's own rendered button imagery onto your keys and dials. Presses, releases, holds and encoder rotations are delivered to Companion with correct semantics, and button graphics update live as Companion feedback, variables and states change.\n\nNot an officially supported Bitfocus product."
+    }
+}
