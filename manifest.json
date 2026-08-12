@@ -4,7 +4,7 @@
     "version": "0.1.0",
     "app-version": "1.5.0-beta.15",
     "minimum-app-version": "1.5.0-beta.15",
-    "github": "https://github.com/grantabell/StreamController-BitfocusCompanion",
+    "github": "https://github.com/GrantAbell/StreamController-BitfocusCompanion",
     "thumbnail": "store/Thumbnail.png",
     "tags": [
         "Companion",
